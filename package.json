@@ -1,7 +1,7 @@
 {
-  "name": "@hzg-wpi/XXX",
+  "name": "@hzg-wpi/beamtimedb-waltz-plugin",
   "version": "1.0.0",
-  "description": "XXX",
+  "description": "BeamtimeDb plugin for Waltz",
   "module": "dist/module/index.js",
   "directories": {
     "doc": "docs",
@@ -18,7 +18,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hzg-wpi/XXX.git"
+    "url": "git+https://github.com/hzg-wpi/beamtimedb-waltz-plugin.git"
   },
   "keywords": [
     "waltz",
@@ -31,9 +31,9 @@
   "author": "Ingvord",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/hzg-wpi/XXX/issues"
+    "url": "https://github.com/hzg-wpi/beamtimedb-waltz-plugin/issues"
   },
-  "homepage": "https://github.com/hzg-wpi/XXX",
+  "homepage": "https://github.com/hzg-wpi/beamtimedb-waltz-plugin",
   "devDependencies": {
     "@babel/core": "^7.9.6",
     "@babel/preset-env": "^7.9.6",
@@ -63,12 +63,12 @@
     "webpack-dev-server": "^3.1.4"
   },
   "dependencies": {
-    "@waltz-controls/middleware": "^1.2.7",
+    "@waltz-controls/middleware": "^2.0.0",
     "@waltz-controls/tango-rest-client": "^1.5.0",
-    "@waltz-controls/waltz-tango-rest-plugin": "^1.0.2",
-    "@waltz-controls/waltz-user-actions-plugin": "^1.0.0",
-    "@waltz-controls/waltz-user-context-plugin": "^1.0.1",
-    "@waltz-controls/waltz-webix-extensions": "^1.0.8",
+    "@waltz-controls/waltz-tango-rest-plugin": "^2.0.2",
+    "@waltz-controls/waltz-user-actions-plugin": "^2.0.0",
+    "@waltz-controls/waltz-user-context-plugin": "^2.0.0",
+    "@waltz-controls/waltz-webix-extensions": "^1.0.10",
     "codemirror": "^5.53.2"
   },
   "runtimeDependencies": [
