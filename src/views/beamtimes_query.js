@@ -1,6 +1,6 @@
 import {codemirror_textarea} from "@waltz-controls/waltz-webix-extensions";
 import {ContextEntity} from "widget/beamtimedb";
-import {kChannelLog, kTopicError} from "@waltz-controls/waltz-user-context-plugin";
+import {kChannelLog} from "@waltz-controls/waltz-user-context-plugin";
 
 
 RegExp.prototype.toJSON = function () {
@@ -18,9 +18,11 @@ const json_textarea = webix.protoUI({
      */
     getValue: function () {
         try {
-            return eval(`(function(){const q = {${this.editor.getValue()}}; return q;})();`);
+            return new Function(`{ return {${this.editor.getValue()}} }`)();
         } catch (e) {
-            this.config.root.dispatchError(e, kTopicError, kChannelLog);
+            this.config.root.dispatchError(e, 'topic:log', kChannelLog);
+            //TODO highlight
+            throw e;
         }
     },
     getValueRaw() {

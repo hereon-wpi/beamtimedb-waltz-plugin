@@ -1,11 +1,13 @@
 import "views/beamtimes_body";
 import {WaltzWidget} from "@waltz-controls/middleware";
 import {kChannelLog, kTopicError, kUserContext} from "@waltz-controls/waltz-user-context-plugin";
-import {kWidgetMain} from "../../index";
 import newLeftPanelUI from "views/left_panel";
 
 export const kWidgetBeamtimedb = 'widget:beamtimedb';
 export const kTopicSelectBeamtime = 'topic:select.beamtime';
+
+//from Waltz
+const kWidgetMain = 'widget:main';
 
 const kBeamtimesBodyHeader = "<span class='webix_icon mdi mdi-table'></span> Beamtimes";
 
@@ -43,7 +45,7 @@ function parseBeamtime(beamtime, id = beamtime.id) {
     });
 }
 
-export default class BeamtimeDbWidget extends WaltzWidget {
+export class BeamtimeDbWidget extends WaltzWidget {
     constructor(app) {
         super(kWidgetBeamtimedb, app);
 
@@ -54,13 +56,30 @@ export default class BeamtimeDbWidget extends WaltzWidget {
                     .then(userContext =>
                         userContext.getOrDefault(this.name, []).map(contextEntity => new ContextEntity(contextEntity)))
             },
-            save: () => {
-                debugger
+            save: (view, params, dp) => {
+                return this.getUserContext()
+                    .then(userContext => userContext.updateExt(this.name, ext => {
+                        const index = ext.findIndex(contextEntity => contextEntity.id === params.id)
+                        switch (params.operation) {
+                            case "insert":
+                                ext.push(new ContextEntity(params.data))
+                                return;
+                            case "update":
+                                ext[index] = new ContextEntity(params.data);
+                                return;
+                            case "delete":
+                                ext.splice(index, 1)
+                                return;
+                        }
+                    }))
+                    .then(userContext => userContext.save())
+                    .then(() => this.dispatch("UserContext has been successfully updated!", 'topic:log', kChannelLog))
             }
         }
 
         this.queries = new webix.DataCollection({
-            url: queriesProxy
+            url: queriesProxy,
+            save: queriesProxy
         });
 
         this.beamtimes = new webix.DataCollection({

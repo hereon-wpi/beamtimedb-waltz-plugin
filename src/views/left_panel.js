@@ -9,8 +9,7 @@ export default function newLeftPanelUI(root) {
         header: kBeamtimesListPanelHeader,
         headerAlt: '',
         headerHeight: 0,
-        headerHeightAlt: 30,
-        width: 300,
+        headerHeightAlt: 32,
         collapsed: true,
         body: {
             view: 'tabview',
