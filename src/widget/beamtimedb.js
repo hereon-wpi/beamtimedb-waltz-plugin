@@ -1,15 +1,13 @@
-import "views/beamtimes_list";
 import "views/beamtimes_body";
 import {WaltzWidget} from "@waltz-controls/middleware";
 import {kChannelLog, kTopicError, kUserContext} from "@waltz-controls/waltz-user-context-plugin";
 import {kWidgetMain} from "../../index";
-import {parseBeamtime} from "../views/beamtimes_treetable";
+import newLeftPanelUI from "views/left_panel";
 
 export const kWidgetBeamtimedb = 'widget:beamtimedb';
 export const kTopicSelectBeamtime = 'topic:select.beamtime';
 
 const kBeamtimesBodyHeader = "<span class='webix_icon mdi mdi-table'></span> Beamtimes";
-const kBeamtimesListPanelHeader = "<span class='webix_icon mdi mdi-table'></span> Beamtimes";
 
 const kBeamtimeDbApiEntryPoint = '/beamtimedb/api/beamtimes';
 
@@ -18,6 +16,31 @@ export class ContextEntity {
         this.id = id;
         this.value = value;
     }
+}
+
+function parseBeamtime(beamtime, id = beamtime.id) {
+    return Object.keys(beamtime).map(key => {
+        if (beamtime[key] === null || beamtime[key] === undefined) {
+            return {
+                id: `${id}.${key}`,
+                key,
+                value: undefined
+            }
+        }
+        if (typeof beamtime[key] == "object") {
+            return {
+                id: `${id}.${key}`,
+                key,
+                data: parseBeamtime(beamtime[key], `${id}.${key}`)
+            }
+        } else {
+            return {
+                id: `${id}.${key}`,
+                key,
+                value: beamtime[key]
+            };
+        }
+    });
 }
 
 export default class BeamtimeDbWidget extends WaltzWidget {
@@ -32,7 +55,7 @@ export default class BeamtimeDbWidget extends WaltzWidget {
                         userContext.getOrDefault(this.name, []).map(contextEntity => new ContextEntity(contextEntity)))
             },
             save: () => {
-
+                debugger
             }
         }
 
@@ -64,16 +87,7 @@ export default class BeamtimeDbWidget extends WaltzWidget {
     }
 
     leftPanel() {
-        return {
-            view: 'accordionitem',
-            header: kBeamtimesListPanelHeader,
-            width: 300,
-            body: {
-                view: 'beamtimes_list',
-                id: 'beamtimes_list',
-                root: this
-            }
-        };
+        return newLeftPanelUI(this);
     }
 
     run() {

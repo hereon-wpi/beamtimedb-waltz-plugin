@@ -1,6 +1,6 @@
 import BeamtimeDbWidget, {kWidgetBeamtimedb} from "widget/beamtimedb";
-import {kUserContext, UserContext} from "@waltz-controls/waltz-user-context-plugin";
-import {Application, WaltzWidget} from "@waltz-controls/middleware";
+import {kChannelLog, kTopicError, kUserContext, UserContext} from "@waltz-controls/waltz-user-context-plugin";
+import {Application, Controller, WaltzWidget} from "@waltz-controls/middleware";
 
 export const kWidgetMain = 'widget:main';
 
@@ -49,6 +49,13 @@ class Main extends WaltzWidget {
 
 const app = new Application({name: APPNAME, version: VERSION})
     .registerContext(kUserContext, dummyUserContext)
+    .registerController(application => new class extends Controller {
+        constructor() {
+            super('log', application);
+
+            this.listen(event => console.error(event), kTopicError, kChannelLog)
+        }
+    })
     .registerWidget(application => new Main(application))
     .registerWidget(application => new BeamtimeDbWidget(application))
     .run()
