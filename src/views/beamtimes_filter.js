@@ -3,6 +3,7 @@
  * @author Igor Khokhriakov <igor.khokhriakov@hzg.de>
  * @since 11.02.2020
  */
+//TODO improve - parseBeamtime after loading data in root.beamtimes
 export default function filter(obj, value) {
     value = value.toLowerCase();
     if (value.startsWith("a:") ||
@@ -14,18 +15,18 @@ export default function filter(obj, value) {
 
         switch (key) {
             case "a:":
-                return obj.applicant_lower.includes(filter);
+                return obj.applicant.toLowerCase().includes(filter);
             case "p:":
-                return obj.pi_lower.includes(filter);
+                return obj.pi.toLowerCase().includes(filter);
             case "l:":
-                return obj.leader_lower.includes(filter);
+                return obj.leader.toLowerCase().includes(filter);
             case "i:":
-                return obj.beamtimeId_lower.includes(filter);
+                return obj.beamtimeId.toLowerCase().includes(filter);
         }
     } else {
-        return obj.applicant_lower.includes(value) ||
-            obj.leader_lower.includes(value) ||
-            obj.pi_lower.includes(value) ||
-            obj.beamtimeId_lower.includes(value)
+        return obj.applicant.toLowerCase().includes(value) ||
+            obj.leader.toLowerCase().includes(value) ||
+            obj.pi.toLowerCase().includes(value) ||
+            obj.beamtimeId.toLowerCase().includes(value)
     }
 }
