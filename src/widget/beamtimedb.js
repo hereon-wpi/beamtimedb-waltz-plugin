@@ -1,7 +1,9 @@
-import "views/index";
+import "views/beamtimes_list";
+import "views/beamtimes_body";
 import {WaltzWidget} from "@waltz-controls/middleware";
-import {kUserContext} from "@waltz-controls/waltz-user-context-plugin";
+import {kChannelLog, kTopicError, kUserContext} from "@waltz-controls/waltz-user-context-plugin";
 import {kWidgetMain} from "../../index";
+import {parseBeamtime} from "../views/beamtimes_treetable";
 
 export const kWidgetBeamtimedb = 'widget:beamtimedb';
 export const kTopicSelectBeamtime = 'topic:select.beamtime';
@@ -9,7 +11,9 @@ export const kTopicSelectBeamtime = 'topic:select.beamtime';
 const kBeamtimesBodyHeader = "<span class='webix_icon mdi mdi-table'></span> Beamtimes";
 const kBeamtimesListPanelHeader = "<span class='webix_icon mdi mdi-table'></span> Beamtimes";
 
-class ContextEntity {
+const kBeamtimeDbApiEntryPoint = '/beamtimedb/api/beamtimes';
+
+export class ContextEntity {
     constructor({id, value}) {
         this.id = id;
         this.value = value;
@@ -36,16 +40,11 @@ export default class BeamtimeDbWidget extends WaltzWidget {
             url: queriesProxy
         });
 
-        this.listen(ev => {
-            debugger
-            if (this.$$panel.getChildViews()[0] === this.getParentView() &&
-                !this.$$panel.getChildViews()[0].config.collapsed)
-                $$('beamtimes_list').refresh();
-        }, 'refresh', this.name);
+        this.beamtimes = new webix.DataCollection({
+            url: kBeamtimeDbApiEntryPoint
+        });
 
-        this.listen((beamtime) => {
-            this.$$body.query(beamtime)
-        }, kTopicSelectBeamtime, this.name);
+        this.listen((beamtime) => this.query(beamtime), kTopicSelectBeamtime, this.name);
     }
 
     getUserContext() {
@@ -82,5 +81,28 @@ export default class BeamtimeDbWidget extends WaltzWidget {
 
 
         this.$$body = this.$$body || $$(this.app.getWidget(kWidgetMain).mainView.addView(this.ui()));
+    }
+
+    /**
+     *
+     * @param query
+     */
+    query(query) {
+        this.$$body.showProgress()
+        this.$$body.$$('output').clearAll();
+
+        fetch(kBeamtimeDbApiEntryPoint, {
+            method: 'post',
+            headers: {
+                "Content-type": "application/json"
+            },
+            body: JSON.stringify(query)
+        })
+            .then(resp => resp.json())
+            .then(beamtimes => {
+                this.$$body.$$('output').parse(beamtimes.flatMap(beamtime => parseBeamtime(JSON.parse(beamtime))))
+            })
+            .catch(err => this.dispatchError(err, kTopicError, kChannelLog))
+            .finally(() => this.$$body.hideProgress())
     }
 }

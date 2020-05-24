@@ -1,17 +1,8 @@
-/**
- *
- * @author Igor Khokhriakov <igor.khokhriakov@hzg.de>
- * @since 20.11.2019
- */
-import filter from "./beamtimes_filter.js";
-import {newBeamtimesTreeTable, parseBeamtime} from "./beamtimes_treetable.js";
-import {codemirror_textarea, newSearch} from "@waltz-controls/waltz-webix-extensions";
-import {kTopicSelectBeamtime, kWidgetBeamtimedb} from "../widget/beamtimedb";
+import {ContextEntity} from "../widget/beamtimedb";
+import {newBeamtimesTreeTable} from "./beamtimes_treetable";
+import {codemirror_textarea} from "@waltz-controls/waltz-webix-extensions";
 
 
-const kBeamtimeDbApiEntryPoint = '/beamtimedb/api/beamtimes';
-
-//TODO prevent global scope
 RegExp.prototype.toJSON = function () {
     return {
         $regex: this.source,
@@ -19,7 +10,12 @@ RegExp.prototype.toJSON = function () {
     }
 };
 
-const kBeamtimesChannel = "beamtimes";
+const ajax = webix.ajax;
+
+function promiseBeamtimes() {
+    return ajax(kBeamtimeDbApiEntryPoint)
+        .then(response => response.json())
+}
 
 const json_textarea = webix.protoUI({
     name: "json_textarea",
@@ -47,80 +43,6 @@ const json_textarea = webix.protoUI({
         config.mode = "application/json"
     }
 }, codemirror_textarea);
-
-
-function newList(config) {
-    return {
-        view: "list",
-        id: "list",
-        select: true,
-        type: {
-            height: "auto"
-        },
-        template(obj) {
-            return `<ul>
-                    <li>Applicant: ${obj.applicant}</li>
-                    <li>Principle Investigator: ${obj.pi}</li>
-                    <li>Leader: ${obj.leader}</li>
-                    <li>Id: ${obj.beamtimeId}</li>
-                    </ul>`;
-        },
-        scheme: {
-            $init(obj) {
-                for (const property in obj) {
-                    obj[`${property}_lower`] = obj[property].toLowerCase();
-                }
-            }
-        },
-        on: {
-            onItemClick(id) {
-                const beamtime = this.getItem(id);
-                config.root.dispatch(beamtime, kTopicSelectBeamtime, kWidgetBeamtimedb);
-            }
-        }
-    };
-}
-
-const ajax = webix.ajax;
-
-function promiseBeamtimes() {
-    return ajax(kBeamtimeDbApiEntryPoint)
-        .then(response => response.json())
-}
-
-const beamtimes_list = webix.protoUI(
-    {
-        name: 'beamtimes_list',
-        refresh() {
-            promiseBeamtimes()
-                .then(ids => {
-                    this.$$('list').clearAll();
-                    this.$$('list').parse(ids);
-                })
-        },
-        ui(config) {
-            return {
-                rows: [
-                    newSearch("list", filter),
-                    newList(config)
-                ]
-            }
-        },
-        save() {
-            return false;
-        },
-        /**
-         * @constructs
-         * @memberof ui.DeviceViewPanel.DevicePanelPipes
-         */
-        $init: function (config) {
-            webix.extend(config, this.ui(config));
-            this.$ready.push(() => {
-                this.refresh();
-            });
-        }
-    }, webix.ProgressBar, webix.IdSpace, webix.ui.layout
-);
 
 function newBeamtimesToolbar() {
     return {
@@ -217,21 +139,6 @@ function newBeamtimesBodyUI() {
     }
 }
 
-function promiseBeamtimesBy(query) {
-    return ajax().headers({
-        "Content-type": "application/json"
-    })
-        .post(kBeamtimeDbApiEntryPoint, query)
-        .then(response => response.json())
-
-}
-
-class UserQuery {
-    constructor(id, code) {
-        this.id = id;
-        this.code = code;
-    }
-}
 
 const beamtimes_body = webix.protoUI({
     name: 'beamtimes_body',
@@ -239,37 +146,30 @@ const beamtimes_body = webix.protoUI({
         if (!this.isVisible() || this.$destructed) return;
 
         if (!this.$$('query_name').validate()) return null;
-        const name = this.$$('query_name').getValue().trim();
-        const code = this.$$('query').getValueRaw();
+        const id = this.$$('query_name').getValue().trim();
+        const value = this.$$('query').getValueRaw();
 
         const query = this.$$('queries_list').getItem(name);
 
         if (query === undefined)
-            this.$$('queries_list').add(new UserQuery(name, code));
+            this.$$('queries_list').add(new ContextEntity({id, value}));
         else
-            this.$$('queries_list').update(name, {
-                id: name,
-                code
+            this.$$('queries_list').update(id, {
+                value
             });
     },
     remove() {
         if (!this.isVisible() || this.$destructed) return;
 
         if (!this.$$('query_name').validate()) return null;
-        const name = this.$$('query_name').getValue().trim();
+        const id = this.$$('query_name').getValue().trim();
 
-        const query = this.$$('queries_list').getItem(name);
+        const query = this.$$('queries_list').getItem(id);
 
         if (query !== undefined)
-            this.$$('queries_list').remove(name);
+            this.$$('queries_list').remove(id);
     },
-    query(query) {
-        promiseBeamtimesBy(query)
-            .then(beamtimes => {
-                this.$$('output').clearAll();
-                this.$$('output').parse(beamtimes.flatMap(beamtime => parseBeamtime(JSON.parse(beamtime))))
-            })
-    },
+
     $init(config) {
         webix.extend(config, newBeamtimesBodyUI());
 
