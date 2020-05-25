@@ -45,7 +45,16 @@ function parseBeamtime(beamtime, id = beamtime.id) {
     });
 }
 
+/**
+ * @type BeamtimeDbWidget
+ * @extends WaltzWidget
+ */
 export class BeamtimeDbWidget extends WaltzWidget {
+    /**
+     *
+     * @param {Application} app
+     * @constructor
+     */
     constructor(app) {
         super(kWidgetBeamtimedb, app);
 
@@ -109,6 +118,9 @@ export class BeamtimeDbWidget extends WaltzWidget {
         return newLeftPanelUI(this);
     }
 
+    /**
+     *
+     */
     run() {
         this.$$panel = this.$$panel || $$(this.app.getWidget(kWidgetMain).leftPanel.addView(this.leftPanel()));
 
@@ -118,7 +130,7 @@ export class BeamtimeDbWidget extends WaltzWidget {
 
     /**
      *
-     * @param query
+     * @param {json} query
      */
     query(query) {
         this.$$body.showProgress()
