@@ -1,2 +1,2 @@
 // noinspection ES6UnusedImports
-import {BeamtimeDbWidget} from "./widget/beamtimedb";
+export {BeamtimeDbWidget} from "./widget/beamtimedb";
