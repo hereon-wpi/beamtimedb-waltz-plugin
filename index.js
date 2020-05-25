@@ -1,4 +1,4 @@
-import BeamtimeDbWidget, {kWidgetBeamtimedb} from "widget/beamtimedb";
+import {BeamtimeDbWidget, kWidgetBeamtimedb} from "widget/beamtimedb";
 import {kChannelLog, kTopicError, kUserContext, UserContext} from "@waltz-controls/waltz-user-context-plugin";
 import {Application, Controller, WaltzWidget} from "@waltz-controls/middleware";
 
