@@ -133,6 +133,7 @@ export class BeamtimeDbWidget extends WaltzWidget {
      * @param {json} query
      */
     query(query) {
+        this.$$body.show();
         this.$$body.showProgress()
         this.$$body.$$('output').clearAll();
 
