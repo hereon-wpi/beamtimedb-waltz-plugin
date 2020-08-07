@@ -54,6 +54,7 @@ const beamtimes_list = webix.protoUI(
             webix.extend(config, this.ui(config));
 
             this.$ready.push(() => {
+                this.showProgress();
                 this.$$('list').data.sync(config.root.beamtimes);
             });
         }

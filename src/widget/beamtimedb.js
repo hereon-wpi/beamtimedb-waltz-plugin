@@ -95,6 +95,10 @@ export class BeamtimeDbWidget extends WaltzWidget {
             url: kBeamtimeDbApiEntryPoint
         });
 
+        this.beamtimes.waitData.then(() => {
+            $$('beamtimes_list').hideProgress()
+        })
+
         this.listen((beamtime) => this.query(beamtime), kTopicSelectBeamtime, this.name);
     }
 
