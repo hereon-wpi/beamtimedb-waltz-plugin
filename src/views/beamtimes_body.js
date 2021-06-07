@@ -2,6 +2,8 @@ function newBeamtimesTreeTable() {
     return {
         view: "treetable",
         id: "output",
+        drag: true,
+        dragscroll: true,
         columns: [
             {
                 id: "key",

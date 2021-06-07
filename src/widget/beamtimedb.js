@@ -126,6 +126,8 @@ export class BeamtimeDbWidget extends WaltzWidget {
      *
      */
     run() {
+        this.app.getWidget('widget:main').mainView.removeView('widget:dashboard');
+
         this.$$panel = this.$$panel || $$(this.app.getWidget(kWidgetMain).leftPanel.addView(this.leftPanel()));
 
 
