@@ -43,7 +43,7 @@
     "babel-loader": "^8.1.0",
     "btoa": "^1.2.1",
     "chai": "^4.1.2",
-    "css-loader": "^0.28.7",
+    "css-loader": "^7.1.5",
     "eslint": "^4.7.2",
     "express": "^4.17.1",
     "file-loader": "^0.11.2",
